@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -47,7 +49,26 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _chocou = false;
   double _remainTimeOfRaid = 1;
   double _maxWaitingTimeForRaid = 1;
-  var _currentTime = DateTime.now();
+  // var _currentTime = DateTime.now();
+
+  var _now;
+  Timer _everySecond;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // sets first value
+    _now = DateTime.now();
+
+    // defines a timer
+    _everySecond = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      setState(() {
+        _now = DateTime.now();
+      });
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   onChanged: (time) {
                                     setState(() {
                                       _remainTimeOfRaid = time;
-                                      _currentTime = DateTime.now();
+                                      // _currentTime = DateTime.now();
                                       _maxWaitingTimeForRaid = 1;
                                     });
                                   },
@@ -161,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Text('Até que horas você quer fazer a Reide?'),
                                 Slider(
                                   value: _maxWaitingTimeForRaid,
-                                  label: _currentTime.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).hour.toString() + ':' + _currentTime.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).minute.toString(),
+                                  label: _now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).hour.toString() + ':' + _now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).minute.toString(),
                                   divisions: _remainTimeOfRaid.toInt(),
                                   min: 1,
                                   max: _remainTimeOfRaid,
@@ -171,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     });
                                   },
                                 ),
-                                Text(_currentTime.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).hour.toString() + ':' + _currentTime.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).minute.toString()),
+                                Text(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).hour.toString() + ':' + _now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).minute.toString()),
                                 const SizedBox(
                                   height: 24,
                                 ),
