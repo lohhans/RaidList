@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -67,6 +69,12 @@ class _MyHomePageState extends State<MyHomePage> {
         _now = DateTime.now();
       });
     });
+  }
+  
+  String formatTime(DateTime dateTime) {
+    DateFormat dateFormat = DateFormat("HH:mm");
+    String timeFormatted = dateFormat.format(dateTime);
+    return timeFormatted;
   }
 
 
@@ -179,10 +187,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 const SizedBox(
                                   height: 24,
                                 ),
-                                Text('Até que horas você quer fazer a Reide?'),
+                                Text('Que horas você quer fazer a Reide?'),
                                 Slider(
                                   value: _maxWaitingTimeForRaid,
-                                  label: _now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).hour.toString() + ':' + _now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).minute.toString(),
+                                  label: formatTime(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt()))),
                                   divisions: _remainTimeOfRaid.toInt(),
                                   min: 1,
                                   max: _remainTimeOfRaid,
@@ -192,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     });
                                   },
                                 ),
-                                Text(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).hour.toString() + ':' + _now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())).minute.toString()),
+                                Text(formatTime(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())))),
                                 const SizedBox(
                                   height: 24,
                                 ),
@@ -225,7 +233,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             onPressed: () {
                               var today = new DateTime.now();
                               var endOfRaid = today.add(Duration(minutes: _remainTimeOfRaid.toInt()));
-                              print(endOfRaid.hour.toString() + ':' + endOfRaid.minute.toString());
+
+                              // Output: 01/01/2021, 02:41 PM
+                              print(formatTime(endOfRaid));
                             },
                           ),
                         ],
