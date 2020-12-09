@@ -175,9 +175,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Slider(
                                   value: _remainTimeOfRaid,
                                   label: _remainTimeOfRaid.toInt() == 1 ? _remainTimeOfRaid.toInt().toString() + " minuto" : _remainTimeOfRaid.toInt().toString() + " minutos",
-                                  divisions: 45,
+                                  divisions: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
                                   min: 1,
-                                  max: 45,
+                                  max: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
                                   onChanged: (time) {
                                     setState(() {
                                       _remainTimeOfRaid = time;
@@ -220,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   max: 60,
                                   onChanged: (time) {
                                     setState(() {
-                                      _maxWaitingTimeForRaid = 1;
+                                      // _maxWaitingTimeForRaid = 1;
                                       _timeToStartRaid = time;
                                       // _raidStartAt.add(Duration(minutes: _timeToStartRaid.toInt()));
                                     });
@@ -234,9 +234,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Slider(
                                   value: _increaseMinutesToMaxWaitingTimeForRaid,
                                   label: formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt()))),
-                                  divisions: 45,
+                                  divisions: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
                                   min: 1,
-                                  max: 45,
+                                  max: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
                                   onChanged: (time) {
                                     setState(() {
                                       _increaseMinutesToMaxWaitingTimeForRaid = time;
