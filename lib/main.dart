@@ -50,7 +50,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool _chocou = false;
   double _remainTimeOfRaid = 1;
+  double _timeToStartRaid = 1;
   double _maxWaitingTimeForRaid = 1;
+  double _increaseMinutesToMaxWaitingTimeForRaid = 1;
   // var _currentTime = DateTime.now();
 
   var _now;
@@ -142,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           Center(
                             child: ToggleSwitch(
+                              changeOnTap: false,
                               initialLabelIndex: _chocou ? 1 : 0,
                               minWidth: 90.0,
                               cornerRadius: 20.0,
@@ -208,7 +211,42 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             replacement: Column(
                               children: [
-                                Text('nn chocou'),
+                                Text('Quantos minutos faltam para a Reide iniciar?'),
+                                Slider(
+                                  value: _timeToStartRaid,
+                                  label: _timeToStartRaid.toInt() == 1 ? _timeToStartRaid.toInt().toString() + " minuto" : _timeToStartRaid.toInt().toString() + " minutos",
+                                  divisions: 60,
+                                  min: 1,
+                                  max: 60,
+                                  onChanged: (time) {
+                                    setState(() {
+                                      _maxWaitingTimeForRaid = 1;
+                                      _timeToStartRaid = time;
+                                      // _raidStartAt.add(Duration(minutes: _timeToStartRaid.toInt()));
+                                    });
+                                  },
+                                ),
+                                Text(_timeToStartRaid.toInt() == 1 ? _timeToStartRaid.toInt().toString() + " minuto" : _timeToStartRaid.toInt().toString() + " minutos"),
+                                const SizedBox(
+                                  height: 24,
+                                ),
+                                Text('Que horas você quer fazer a Reide? (Choca: ' + formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt()))) + ')'),
+                                Slider(
+                                  value: _increaseMinutesToMaxWaitingTimeForRaid,
+                                  label: formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt()))),
+                                  divisions: 45,
+                                  min: 1,
+                                  max: 45,
+                                  onChanged: (time) {
+                                    setState(() {
+                                      _increaseMinutesToMaxWaitingTimeForRaid = time;
+                                    });
+                                  },
+                                ),
+                                Text(formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt())))),
+                                const SizedBox(
+                                  height: 24,
+                                ),
                               ],
                             ),
                           ),
