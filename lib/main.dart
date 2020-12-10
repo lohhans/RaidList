@@ -49,6 +49,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool _chocou = false;
+  bool _secondAccount = false;
   double _remainTimeOfRaid = 1;
   double _timeToStartRaid = 1;
   double _maxWaitingTimeForRaid = 1;
@@ -56,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // var _currentTime = DateTime.now();
 
   var _now;
-  Timer _everySecond;
+  Timer _everySecond; // ignore: unused_field
 
   @override
   void initState() {
@@ -91,6 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.all(8),
           child: Column(
             children: <Widget>[
+              // POKE NAME
               Card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -117,12 +119,44 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                           TextFormField(),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          TextFormField(
+                            cursorColor: Colors.black,
+                            // keyboardType: inputType,
+                            decoration: new InputDecoration(
+                              /*border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(width: 1.0, color: Colors.red),
+                              ),*/
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                BorderSide(width: 1.0, color: Colors.red),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                BorderSide(width: 1.0, color: Colors.grey),
+                              ),
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.only(
+                                left: 8,
+                                bottom: 4,
+                                top: 0,
+                                right: 8,
+                              ),
+                              labelText: 'Digite o nome do Ginásio',
+                              // hintText: "Insira seu nick",
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
+              // TIME
               Card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -256,6 +290,151 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
               ),
+              // ACCOUNTS
+              Card(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Informe sua(s) conta(s):',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 24,
+                          ),
+                          Text('Primeira conta: '),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          TextFormField(
+                            cursorColor: Colors.black,
+                            // keyboardType: inputType,
+                            decoration: new InputDecoration(
+                              /*border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(width: 1.0, color: Colors.red),
+                              ),*/
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                BorderSide(width: 1.0, color: Colors.red),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                BorderSide(width: 1.0, color: Colors.grey),
+                              ),
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.only(
+                                left: 8,
+                                bottom: 4,
+                                top: 0,
+                                right: 8,
+                              ),
+                              labelText: 'Insira seu nick',
+                              // hintText: "Insira seu nick",
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          TextFormField(
+                            cursorColor: Colors.black,
+                            // keyboardType: inputType,
+                            decoration: new InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.only(
+                                left: 8,
+                                bottom: 4,
+                                top: 0,
+                                right: 8,
+                              ),
+                              labelText: 'Insira seu ID',
+                              // hintText: "Insira seu nick",
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _secondAccount,
+
+                                onChanged: (_) {
+                                  setState(() {
+                                    _secondAccount = !_secondAccount;
+                                  });
+                                },
+                              ),
+                              Text('Adicionar uma segunda conta?'),
+                            ],
+                          ),
+                          Visibility(
+                            visible: _secondAccount,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(
+                                  height: 12,
+                                ),
+                                Text('Segunda conta: '),
+                                TextFormField(
+                                  cursorColor: Colors.black,
+                                  // keyboardType: inputType,
+                                  decoration: new InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.only(
+                                      left: 8,
+                                      bottom: 4,
+                                      top: 0,
+                                      right: 8,
+                                    ),
+                                    labelText: 'Insira seu nick',
+                                    // hintText: "Insira seu nick",
+                                  ),
+                                ),
+                                TextFormField(
+                                  cursorColor: Colors.black,
+                                  // keyboardType: inputType,
+                                  decoration: new InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.only(
+                                      left: 8,
+                                      bottom: 4,
+                                      top: 0,
+                                      right: 8,
+                                    ),
+                                    labelText: 'Insira seu ID',
+                                    // hintText: "Insira seu nick",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // SHARE
               Card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
