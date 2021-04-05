@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:raid_list/services/share_service.dart';
 import 'package:share/share.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
@@ -23,6 +24,10 @@ class _ListaReideState extends State<ListaReide> {
   double _maxWaitingTimeForRaid = 1;
   double _increaseMinutesToMaxWaitingTimeForRaid = 1;
   // var _currentTime = DateTime.now();
+
+  String _hatchTime = '';
+  String _endTime = '';
+  String _partyTime = '';
 
   String _raidBoss = '';
   String _raidGym = '';
@@ -258,6 +263,9 @@ class _ListaReideState extends State<ListaReide> {
                                     setState(() {
                                       // _maxWaitingTimeForRaid = 1;
                                       _timeToStartRaid = time;
+
+                                      _hatchTime = formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt())));
+                                      print('_hatchTime: '+_hatchTime);
                                       // _raidStartAt.add(Duration(minutes: _timeToStartRaid.toInt()));
                                     });
                                   },
@@ -276,6 +284,9 @@ class _ListaReideState extends State<ListaReide> {
                                   onChanged: (time) {
                                     setState(() {
                                       _increaseMinutesToMaxWaitingTimeForRaid = time;
+
+                                      _partyTime = formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt())));
+                                      print('_partyTime: '+_partyTime);
                                     });
                                   },
                                 ),
@@ -493,16 +504,17 @@ class _ListaReideState extends State<ListaReide> {
 
 
                             onPressed: () async {
+                              ShareService shareService = ShareService();
+
                               var today = new DateTime.now();
                               var endOfRaid = today.add(Duration(minutes: _remainTimeOfRaid.toInt()));
 
-                              this._stringDataOfRaid = '🔱 Boss: $_raidBoss \n ⛩ Gym: $_raidGym \n Eclode: $_timeToStartRaid \n" ⚔ Bater: $_raidBoss \n';
-                              this._accountsData = 'Convidados \n Primeira conta responsável: $_firstAccountName \n Código da primeira conta: $_firstAccountCod \n 1.\n 2 \n 3. \n 4. \n 5. \nContas que irão remotamente (sem necessitar de convite):  \n 1. \n 2. \n 3. \n 4. \n 5. \n';
 
                               // Output: 01/01/2021, 02:41 PM
-                              print(formatTime(endOfRaid));
-                              print(_timeToStartRaid);
-                              Share.share(_stringDataOfRaid + '\n' + _accountsData + '\n' + _warningsInfo);
+                              // print(formatTime(endOfRaid));
+                              // print(_timeToStartRaid);
+                              // Share.share(_stringDataOfRaid + '\n' + _accountsData + '\n' + _warningsInfo);
+                              Share.share(shareService.fullShare(_raidBoss, _raidGym, _hatchTime, _endTime, _partyTime, _firstAccountName, _firstAccountCod, _firstAccountName, _firstAccountCod));
                             },
                           ),
                         ],

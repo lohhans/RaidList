@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:raid_list/view/lista_reide.dart';
+import 'package:raid_list/screens/lista_reide.dart';
 
 void main() {
   runApp(MyApp());
