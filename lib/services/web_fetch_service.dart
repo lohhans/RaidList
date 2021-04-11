@@ -7,18 +7,22 @@ Future initiate() async {
   var client = Client();
   Response response = await client.get(Uri.parse('https://leekduck.com/boss/'));
 
-  print(response.body);
-
   // Use html parser
   var document = parse(response.body);
+
+  // Query for names
   List<Element> linksWithName = document.querySelectorAll('.boss-name');
+  // Query for sprites
   List<Element> linksWithSprite = document.querySelectorAll('.boss-img img:not(.shiny-icon)');
-  print(linksWithName.length.toString() + ' - ' + linksWithSprite.length.toString());
 
-  print(linksWithSprite[1].attributes.values);
+  // prints for debug
+  // print(linksWithName.length.toString() + ' - ' + linksWithSprite.length.toString());
+  // print(linksWithSprite[1].attributes.values);
 
+  // Bosses in json
   List<Map<String, dynamic>> bosses = [];
 
+  // Data processing
   for (var i = 0 ; i < linksWithName.length; i++) {
     bosses.add({
       'name': linksWithName[i].text,
@@ -26,5 +30,7 @@ Future initiate() async {
     });
   }
 
-  return json.encode(bosses);
+  // print(bosses.runtimeType);
+
+  return bosses;
 }

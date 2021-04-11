@@ -7,6 +7,27 @@ import 'package:raid_list/services/share_service.dart';
 import 'package:share/share.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
+import 'package:raid_list/services/web_fetch_service.dart' as web_fetch_service;
+
+class Boss {
+  String name;
+  String sprite;
+
+  Boss(this.name, this.sprite);
+
+
+
+  // static List<Boss> getCompanies() {
+  //   return <Boss>[
+  //     Boss(1, 'Apple'),
+  //     Company(2, 'Google'),
+  //     Company(3, 'Samsung'),
+  //     Company(4, 'Sony'),
+  //     Company(5, 'LG'),
+  //   ];
+  // }
+}
+
 class ListaReide extends StatefulWidget {
   ListaReide({Key key, this.title}) : super(key: key);
 
@@ -44,9 +65,16 @@ class _ListaReideState extends State<ListaReide> {
   var _now;
   Timer _everySecond; // ignore: unused_field
 
+  var bosses;
+  List<DropdownMenuItem<Boss>> _dropdownMenuItems;
+  Boss _selectedBoss;
+
+
   @override
   void initState() {
     super.initState();
+
+    getBosses();
 
     // sets first value
     _now = DateTime.now();
@@ -65,6 +93,42 @@ class _ListaReideState extends State<ListaReide> {
     return timeFormatted;
   }
 
+  Future<void> getBosses() async {
+    print('2');
+    bosses = await web_fetch_service.initiate();
+
+    _dropdownMenuItems = buildDropdownMenuItems(bosses);
+    _selectedBoss = _dropdownMenuItems[0].value;
+
+    // print(bosses[2]);
+  }
+
+  List<DropdownMenuItem<Boss>> buildDropdownMenuItems(List bosses) {
+    List<DropdownMenuItem<Boss>> items = List();
+    for (int k = 0; k < bosses.length; k++) {
+      Boss boss = Boss(bosses[k]['name'], bosses[k]['sprite']);
+      items.add(
+        DropdownMenuItem(
+          value: boss,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(flex: 3, child: Center(child: Image.network(boss.sprite, height: 100,))),
+              Padding(padding: EdgeInsets.symmetric(horizontal: 8)),
+              Flexible(flex: 7, child: Text(boss.name)),
+            ],
+          ),
+        ),
+      );
+    }
+    return items;
+  }
+
+  onChangeDropdownItem(Boss selectedBoss) {
+    setState(() {
+      _selectedBoss = selectedBoss;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +161,7 @@ class _ListaReideState extends State<ListaReide> {
                           const SizedBox(
                             height: 24,
                           ),
-                          TextFormField(
+                          /*TextFormField(
                             cursorColor: Colors.black,
                             onChanged: (name){
                               setState(() {
@@ -125,6 +189,13 @@ class _ListaReideState extends State<ListaReide> {
                               labelText: 'Informe o chefe da Reide',
                               // hintText: "Insira seu nick",
                             ),
+                          ),*/
+                          DropdownButton(
+                            value: _selectedBoss,
+                            items: _dropdownMenuItems,
+                            onChanged: onChangeDropdownItem,
+                            // isExpanded: true,
+
                           ),
                           const SizedBox(
                             height: 24,
