@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:raid_list/screens/lista_reide.dart';
+import 'package:raid_list/services/web_fetch_service.dart' as web_fetch_service;
 
-void main() {
+Future<void> main() async {
+  print(await web_fetch_service.initiate());
+
   runApp(MyApp());
 }
 
