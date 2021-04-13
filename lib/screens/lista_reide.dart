@@ -58,9 +58,8 @@ class _ListaReideState extends State<ListaReide> {
   String _secondtAccountName = '';
   String _secondAccountCod = '';
 
-  String _stringDataOfRaid = '';
-  String _accountsData = '';
-  String _warningsInfo = '❗ *ATENÇÃO: Insira seu nick (nome do jogador) corretamente, pois somente com o nome correto será possível convidá-lo!* \n \n‼️ *LEMBRE-SE: A responsabilidade de adicionar a conta é do convidado, portanto, faça com antecedência!* \n \n⚠️ Obs: Somente é permitido 10 jogadores remotamente numa sala, acima disso o jogo não permite entrar na mesma ou convidar, então, por mais que sejam abertas até 15 vagas remotas na lista _(10 por convite e 5 por acesso a distância)_, somente os 10 primeiros a preencherem poderão ser convidados! *Se organizem e divirtam-se :)*';
+  bool _loading = false;
+
 
   var _now;
   Timer _everySecond; // ignore: unused_field
@@ -94,26 +93,27 @@ class _ListaReideState extends State<ListaReide> {
   }
 
   Future<void> getBosses() async {
-    print('2');
-    bosses = await web_fetch_service.initiate();
+    _loading = true;
+    print('Fetching data from MestrePokemon');
+    bosses = await web_fetch_service.fetchDataFromMestrePokemon();
 
     _dropdownMenuItems = buildDropdownMenuItems(bosses);
     _selectedBoss = _dropdownMenuItems[0].value;
-
-    // print(bosses[2]);
+    _loading = false;
   }
 
   List<DropdownMenuItem<Boss>> buildDropdownMenuItems(List bosses) {
-    List<DropdownMenuItem<Boss>> items = List();
+    List<DropdownMenuItem<Boss>> items = [];
     for (int k = 0; k < bosses.length; k++) {
       Boss boss = Boss(bosses[k]['name'], bosses[k]['sprite']);
       items.add(
         DropdownMenuItem(
           value: boss,
+          onTap: () => print(boss.name),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Flexible(flex: 3, child: Center(child: Image.network(boss.sprite, height: 100,))),
+              Flexible(flex: 3, child: Center(child: Image.network(boss.sprite, height: 50,))),
               Padding(padding: EdgeInsets.symmetric(horizontal: 8)),
               Flexible(flex: 7, child: Text(boss.name)),
             ],
@@ -127,6 +127,7 @@ class _ListaReideState extends State<ListaReide> {
   onChangeDropdownItem(Boss selectedBoss) {
     setState(() {
       _selectedBoss = selectedBoss;
+      _raidBoss = _selectedBoss.name;
     });
   }
 
@@ -136,465 +137,473 @@ class _ListaReideState extends State<ListaReide> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            children: <Widget>[
-              // POKE NAME
-              Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Monte sua lista para a Reide:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+      body: Visibility(
+        visible: _loading,
+        child: Container(
+          child: Center(
+            child: Text('Carregando...'),
+          ),
+        ),
+        replacement: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              children: <Widget>[
+                // POKE NAME
+                Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Monte sua lista para a Reide:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 24,
-                          ),
-                          /*TextFormField(
-                            cursorColor: Colors.black,
-                            onChanged: (name){
-                              setState(() {
-                                _raidBoss = name;
-                              });
-                            },
-                            // keyboardType: inputType,
-                            decoration: new InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                BorderSide(width: 1.0, color: Colors.red),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                BorderSide(width: 1.0, color: Colors.grey[300]),
-                              ),
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.only(
-                                left: 8,
-                                bottom: 4,
-                                top: 0,
-                                right: 8,
-                              ),
-                              labelText: 'Informe o chefe da Reide',
-                              // hintText: "Insira seu nick",
+                            const SizedBox(
+                              height: 24,
                             ),
-                          ),*/
-                          DropdownButton(
-                            value: _selectedBoss,
-                            items: _dropdownMenuItems,
-                            onChanged: onChangeDropdownItem,
-                            // isExpanded: true,
-
-                          ),
-                          const SizedBox(
-                            height: 24,
-                          ),
-                          TextFormField(
-                            cursorColor: Colors.black,
-                            onChanged: (name){
-                              setState(() {
-                                _gymName = name;
-                              });
-                            },
-                            decoration: new InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                BorderSide(width: 1.0, color: Colors.red),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                BorderSide(width: 1.0, color: Colors.grey[300]),
-                              ),
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.only(
-                                left: 8,
-                                bottom: 4,
-                                top: 0,
-                                right: 8,
-                              ),
-                              labelText: 'Digite o nome do Ginásio',
-                              // hintText: "Insira seu nick",
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // TIME
-              Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'O ovo já chocou?',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 12,
-                          ),
-                          Center(
-                            child: ToggleSwitch(
-                              changeOnTap: false,
-                              initialLabelIndex: _chocou ? 1 : 0,
-                              minWidth: 90.0,
-                              cornerRadius: 20.0,
-                              activeBgColor: Colors.red,
-                              activeFgColor: Colors.white,
-                              inactiveBgColor: Colors.grey,
-                              inactiveFgColor: Colors.white,
-                              labels: ['SIM', 'NÃO'],
-                              icons: [
-                                FontAwesomeIcons.check,
-                                FontAwesomeIcons.times,
-                              ],
-                              onToggle: (_) {
+                            /*TextFormField(
+                              cursorColor: Colors.black,
+                              onChanged: (name){
                                 setState(() {
-                                  _chocou = !_chocou;
+                                  _raidBoss = name;
                                 });
                               },
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 24,
-                          ),
-                          Visibility(
-                            visible: !_chocou,
-                            child: Column(
-                              children: [
-                                Text('Qual o tempo restante da Reide?'),
-                                Slider(
-                                  value: _remainTimeOfRaid,
-                                  label: _remainTimeOfRaid.toInt() == 1 ? _remainTimeOfRaid.toInt().toString() + " minuto" : _remainTimeOfRaid.toInt().toString() + " minutos",
-                                  divisions: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
-                                  min: 1,
-                                  max: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
-                                  onChanged: (time) {
-                                    setState(() {
-                                      _remainTimeOfRaid = time;
-                                      // _currentTime = DateTime.now();
-                                      _maxWaitingTimeForRaid = 1;
-                                    });
-                                  },
+                              // keyboardType: inputType,
+                              decoration: new InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                  BorderSide(width: 1.0, color: Colors.red),
                                 ),
-                                Text(_remainTimeOfRaid.toInt() == 1 ? _remainTimeOfRaid.toInt().toString() + " minuto" : _remainTimeOfRaid.toInt().toString() + " minutos"),
-                                const SizedBox(
-                                  height: 24,
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                  BorderSide(width: 1.0, color: Colors.grey[300]),
                                 ),
-                                Text('Que horas você quer fazer a Reide?'),
-                                Slider(
-                                  value: _maxWaitingTimeForRaid,
-                                  label: formatTime(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt()))),
-                                  divisions: _remainTimeOfRaid.toInt(),
-                                  min: 1,
-                                  max: _remainTimeOfRaid,
-                                  onChanged: (time) {
-                                    setState(() {
-                                      _maxWaitingTimeForRaid = time;
-                                    });
-                                  },
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.only(
+                                  left: 8,
+                                  bottom: 4,
+                                  top: 0,
+                                  right: 8,
                                 ),
-                                Text(formatTime(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())))),
-                                const SizedBox(
-                                  height: 24,
-                                ),
-                              ],
-                            ),
-                            replacement: Column(
-                              children: [
-                                Text('Quantos minutos faltam para a Reide iniciar?'),
-                                Slider(
-                                  value: _timeToStartRaid,
-                                  label: _timeToStartRaid.toInt() == 1 ? _timeToStartRaid.toInt().toString() + " minuto" : _timeToStartRaid.toInt().toString() + " minutos",
-                                  divisions: 60,
-                                  min: 1,
-                                  max: 60,
-                                  onChanged: (time) {
-                                    setState(() {
-                                      // _maxWaitingTimeForRaid = 1;
-                                      _timeToStartRaid = time;
+                                labelText: 'Informe o chefe da Reide',
+                                // hintText: "Insira seu nick",
+                              ),
+                            ),*/
+                            DropdownButton(
+                              value: _selectedBoss,
+                              items: _dropdownMenuItems,
+                              onChanged: onChangeDropdownItem,
+                              // isExpanded: true,
 
-                                      _hatchTime = formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt())));
-                                      print('_hatchTime: '+_hatchTime);
-                                      // _raidStartAt.add(Duration(minutes: _timeToStartRaid.toInt()));
-                                    });
-                                  },
-                                ),
-                                Text(_timeToStartRaid.toInt() == 1 ? _timeToStartRaid.toInt().toString() + " minuto" : _timeToStartRaid.toInt().toString() + " minutos"),
-                                const SizedBox(
-                                  height: 24,
-                                ),
-                                Text('Que horas você quer fazer a Reide? (Choca: ' + formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt()))) + ')'),
-                                Slider(
-                                  value: _increaseMinutesToMaxWaitingTimeForRaid,
-                                  label: formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt()))),
-                                  divisions: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
-                                  min: 1,
-                                  max: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
-                                  onChanged: (time) {
-                                    setState(() {
-                                      _increaseMinutesToMaxWaitingTimeForRaid = time;
-
-                                      _partyTime = formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt())));
-                                      print('_partyTime: '+_partyTime);
-                                    });
-                                  },
-                                ),
-                                Text(formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt())))),
-                                const SizedBox(
-                                  height: 24,
-                                ),
-                              ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(
+                              height: 24,
+                            ),
+                            TextFormField(
+                              cursorColor: Colors.black,
+                              onChanged: (name){
+                                setState(() {
+                                  _gymName = name;
+                                });
+                              },
+                              decoration: new InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                  BorderSide(width: 1.0, color: Colors.red),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                  BorderSide(width: 1.0, color: Colors.grey[300]),
+                                ),
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.only(
+                                  left: 8,
+                                  bottom: 4,
+                                  top: 0,
+                                  right: 8,
+                                ),
+                                labelText: 'Digite o nome do Ginásio',
+                                // hintText: "Insira seu nick",
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              // ACCOUNTS
-              Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Informe sua(s) conta(s):',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                // TIME
+                Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'O ovo já chocou?',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 24,
-                          ),
-                          Text('Primeira conta: '),
-                          const SizedBox(
-                            height: 12,
-                          ),
-                          TextFormField(
-                            cursorColor: Colors.black,
-                            onChanged: (name){
-                              setState(() {
-                                _firstAccountName = name;
-                              });
-                            },
-                            // keyboardType: inputType,
-                            decoration: new InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                BorderSide(width: 1.0, color: Colors.red),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                BorderSide(width: 1.0, color: Colors.grey[300]),
-                              ),
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.only(
-                                left: 8,
-                                bottom: 4,
-                                top: 0,
-                                right: 8,
-                              ),
-                              labelText: 'Informe o nick da primeira conta',
-                              // hintText: "Insira seu nick",
+                            const SizedBox(
+                              height: 12,
                             ),
-                          ),
-                          const SizedBox(
-                            height: 12,
-                          ),
-                          TextFormField(
-                            cursorColor: Colors.black,
-                            onChanged: (name){
-                              setState(() {
-                                _firstAccountCod = name;
-                              });
-                            },
-                            // keyboardType: inputType,
-                            decoration: new InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                BorderSide(width: 1.0, color: Colors.red),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                BorderSide(width: 1.0, color: Colors.grey[300]),
-                              ),
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.only(
-                                left: 8,
-                                bottom: 4,
-                                top: 0,
-                                right: 8,
-                              ),
-                              labelText: 'Informe o código da primeira conta',
-                              // hintText: "Insira seu nick",
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 12,
-                          ),
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: _secondAccount,
-                                onChanged: (_) {
+                            Center(
+                              child: ToggleSwitch(
+                                changeOnTap: false,
+                                initialLabelIndex: _chocou ? 1 : 0,
+                                minWidth: 90.0,
+                                cornerRadius: 20.0,
+                                activeBgColor: Colors.red,
+                                activeFgColor: Colors.white,
+                                inactiveBgColor: Colors.grey,
+                                inactiveFgColor: Colors.white,
+                                labels: ['SIM', 'NÃO'],
+                                icons: [
+                                  FontAwesomeIcons.check,
+                                  FontAwesomeIcons.times,
+                                ],
+                                onToggle: (_) {
                                   setState(() {
-                                    _secondAccount = !_secondAccount;
+                                    _chocou = !_chocou;
                                   });
                                 },
                               ),
-                              Text('Adicionar uma segunda conta?'),
-                            ],
-                          ),
-                          Visibility(
-                            visible: _secondAccount,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            ),
+                            const SizedBox(
+                              height: 24,
+                            ),
+                            Visibility(
+                              visible: !_chocou,
+                              child: Column(
+                                children: [
+                                  Text('Qual o tempo restante da Reide?'),
+                                  Slider(
+                                    value: _remainTimeOfRaid,
+                                    label: _remainTimeOfRaid.toInt() == 1 ? _remainTimeOfRaid.toInt().toString() + " minuto" : _remainTimeOfRaid.toInt().toString() + " minutos",
+                                    divisions: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
+                                    min: 1,
+                                    max: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
+                                    onChanged: (time) {
+                                      setState(() {
+                                        _remainTimeOfRaid = time;
+                                        // _currentTime = DateTime.now();
+                                        _maxWaitingTimeForRaid = 1;
+                                      });
+                                    },
+                                  ),
+                                  Text(_remainTimeOfRaid.toInt() == 1 ? _remainTimeOfRaid.toInt().toString() + " minuto" : _remainTimeOfRaid.toInt().toString() + " minutos"),
+                                  const SizedBox(
+                                    height: 24,
+                                  ),
+                                  Text('Que horas você quer fazer a Reide?'),
+                                  Slider(
+                                    value: _maxWaitingTimeForRaid,
+                                    label: formatTime(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt()))),
+                                    divisions: _remainTimeOfRaid.toInt(),
+                                    min: 1,
+                                    max: _remainTimeOfRaid,
+                                    onChanged: (time) {
+                                      setState(() {
+                                        _maxWaitingTimeForRaid = time;
+                                      });
+                                    },
+                                  ),
+                                  Text(formatTime(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())))),
+                                  const SizedBox(
+                                    height: 24,
+                                  ),
+                                ],
+                              ),
+                              replacement: Column(
+                                children: [
+                                  Text('Quantos minutos faltam para a Reide iniciar?'),
+                                  Slider(
+                                    value: _timeToStartRaid,
+                                    label: _timeToStartRaid.toInt() == 1 ? _timeToStartRaid.toInt().toString() + " minuto" : _timeToStartRaid.toInt().toString() + " minutos",
+                                    divisions: 60,
+                                    min: 1,
+                                    max: 60,
+                                    onChanged: (time) {
+                                      setState(() {
+                                        // _maxWaitingTimeForRaid = 1;
+                                        _timeToStartRaid = time;
+
+                                        _hatchTime = formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt())));
+                                        print('_hatchTime: '+_hatchTime);
+                                        // _raidStartAt.add(Duration(minutes: _timeToStartRaid.toInt()));
+                                      });
+                                    },
+                                  ),
+                                  Text(_timeToStartRaid.toInt() == 1 ? _timeToStartRaid.toInt().toString() + " minuto" : _timeToStartRaid.toInt().toString() + " minutos"),
+                                  const SizedBox(
+                                    height: 24,
+                                  ),
+                                  Text('Que horas você quer fazer a Reide? (Choca: ' + formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt()))) + ')'),
+                                  Slider(
+                                    value: _increaseMinutesToMaxWaitingTimeForRaid,
+                                    label: formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt()))),
+                                    divisions: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
+                                    min: 1,
+                                    max: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
+                                    onChanged: (time) {
+                                      setState(() {
+                                        _increaseMinutesToMaxWaitingTimeForRaid = time;
+
+                                        _partyTime = formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt())));
+                                        print('_partyTime: '+_partyTime);
+                                      });
+                                    },
+                                  ),
+                                  Text(formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt())))),
+                                  const SizedBox(
+                                    height: 24,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // ACCOUNTS
+                Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Informe sua(s) conta(s):',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 24,
+                            ),
+                            Text('Primeira conta: '),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            TextFormField(
+                              cursorColor: Colors.black,
+                              onChanged: (name){
+                                setState(() {
+                                  _firstAccountName = name;
+                                });
+                              },
+                              // keyboardType: inputType,
+                              decoration: new InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                  BorderSide(width: 1.0, color: Colors.red),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                  BorderSide(width: 1.0, color: Colors.grey[300]),
+                                ),
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.only(
+                                  left: 8,
+                                  bottom: 4,
+                                  top: 0,
+                                  right: 8,
+                                ),
+                                labelText: 'Informe o nick da primeira conta',
+                                // hintText: "Insira seu nick",
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            TextFormField(
+                              cursorColor: Colors.black,
+                              onChanged: (name){
+                                setState(() {
+                                  _firstAccountCod = name;
+                                });
+                              },
+                              // keyboardType: inputType,
+                              decoration: new InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                  BorderSide(width: 1.0, color: Colors.red),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                  BorderSide(width: 1.0, color: Colors.grey[300]),
+                                ),
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.only(
+                                  left: 8,
+                                  bottom: 4,
+                                  top: 0,
+                                  right: 8,
+                                ),
+                                labelText: 'Informe o código da primeira conta',
+                                // hintText: "Insira seu nick",
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 12,
+                            ),
+                            Row(
                               children: [
-                                const SizedBox(
-                                  height: 12,
-                                ),
-                                Text('Segunda conta: '),
-                                const SizedBox(
-                                  height: 12,
-                                ),
-                                TextFormField(
-                                  cursorColor: Colors.black,
-                                  onChanged: (name){
+                                Checkbox(
+                                  value: _secondAccount,
+                                  onChanged: (_) {
                                     setState(() {
-                                      _firstAccountName = name;
+                                      _secondAccount = !_secondAccount;
                                     });
                                   },
-                                  // keyboardType: inputType,
-                                  decoration: new InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide:
-                                      BorderSide(width: 1.0, color: Colors.red),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide:
-                                      BorderSide(width: 1.0, color: Colors.grey[300]),
-                                    ),
-                                    errorBorder: InputBorder.none,
-                                    disabledBorder: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(
-                                      left: 8,
-                                      bottom: 4,
-                                      top: 0,
-                                      right: 8,
-                                    ),
-                                    labelText: 'Informe o nick da primeira conta',
-                                    // hintText: "Insira seu nick",
-                                  ),
                                 ),
-                                const SizedBox(
-                                  height: 12,
-                                ),
-                                TextFormField(
-                                  cursorColor: Colors.black,
-                                  onChanged: (name){
-                                    setState(() {
-                                      _firstAccountCod = name;
-                                    });
-                                  },
-                                  // keyboardType: inputType,
-                                  decoration: new InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide:
-                                      BorderSide(width: 1.0, color: Colors.red),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide:
-                                      BorderSide(width: 1.0, color: Colors.grey[300]),
-                                    ),
-                                    errorBorder: InputBorder.none,
-                                    disabledBorder: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(
-                                      left: 8,
-                                      bottom: 4,
-                                      top: 0,
-                                      right: 8,
-                                    ),
-                                    labelText: 'Informe o código da primeira conta',
-                                    // hintText: "Insira seu nick",
-                                  ),
-                                ),
+                                Text('Adicionar uma segunda conta?'),
                               ],
                             ),
-                          ),
-                        ],
+                            Visibility(
+                              visible: _secondAccount,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(
+                                    height: 12,
+                                  ),
+                                  Text('Segunda conta: '),
+                                  const SizedBox(
+                                    height: 12,
+                                  ),
+                                  TextFormField(
+                                    cursorColor: Colors.black,
+                                    onChanged: (name){
+                                      setState(() {
+                                        _firstAccountName = name;
+                                      });
+                                    },
+                                    // keyboardType: inputType,
+                                    decoration: new InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide:
+                                        BorderSide(width: 1.0, color: Colors.red),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide:
+                                        BorderSide(width: 1.0, color: Colors.grey[300]),
+                                      ),
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding: EdgeInsets.only(
+                                        left: 8,
+                                        bottom: 4,
+                                        top: 0,
+                                        right: 8,
+                                      ),
+                                      labelText: 'Informe o nick da primeira conta',
+                                      // hintText: "Insira seu nick",
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 12,
+                                  ),
+                                  TextFormField(
+                                    cursorColor: Colors.black,
+                                    onChanged: (name){
+                                      setState(() {
+                                        _firstAccountCod = name;
+                                      });
+                                    },
+                                    // keyboardType: inputType,
+                                    decoration: new InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide:
+                                        BorderSide(width: 1.0, color: Colors.red),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide:
+                                        BorderSide(width: 1.0, color: Colors.grey[300]),
+                                      ),
+                                      errorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding: EdgeInsets.only(
+                                        left: 8,
+                                        bottom: 4,
+                                        top: 0,
+                                        right: 8,
+                                      ),
+                                      labelText: 'Informe o código da primeira conta',
+                                      // hintText: "Insira seu nick",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              // SHARE
-              Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FlatButton(
-                            child: Text('Compartilhar'),
-                            color: Colors.red,
-                            // onPressed: ()  => Share.share('🔱 Boss: $_raidBoss \n ⛩ Gym: $_raidGym \n Eclode: $_timeToStartRaid \n" ⚔ Bater: $_raidBoss \n', subject: 'Look what I made!'),
-                            // onPressed: ()  => ,
+                // SHARE
+                Card(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FlatButton(
+                              child: Text('Compartilhar'),
+                              color: Colors.red,
+                              // onPressed: ()  => Share.share('🔱 Boss: $_raidBoss \n ⛩ Gym: $_raidGym \n Eclode: $_timeToStartRaid \n" ⚔ Bater: $_raidBoss \n', subject: 'Look what I made!'),
+                              // onPressed: ()  => ,
 
 
-                            onPressed: () async {
-                              ShareService shareService = ShareService();
+                              onPressed: () async {
+                                ShareService shareService = ShareService();
 
-                              var today = new DateTime.now();
-                              var endOfRaid = today.add(Duration(minutes: _remainTimeOfRaid.toInt()));
+                                var today = new DateTime.now();
+                                var endOfRaid = today.add(Duration(minutes: _remainTimeOfRaid.toInt()));
 
 
-                              // Output: 01/01/2021, 02:41 PM
-                              // print(formatTime(endOfRaid));
-                              // print(_timeToStartRaid);
-                              // Share.share(_stringDataOfRaid + '\n' + _accountsData + '\n' + _warningsInfo);
-                              Share.share(shareService.fullShare(_raidBoss, _raidGym, _hatchTime, _endTime, _partyTime, _firstAccountName, _firstAccountCod, _firstAccountName, _firstAccountCod));
-                            },
-                          ),
-                        ],
+                                // Output: 01/01/2021, 02:41 PM
+                                // print(formatTime(endOfRaid));
+                                // print(_timeToStartRaid);
+                                // Share.share(_stringDataOfRaid + '\n' + _accountsData + '\n' + _warningsInfo);
+                                Share.share(shareService.fullShare(_raidBoss, _raidGym, _hatchTime, _endTime, _partyTime, _firstAccountName, _firstAccountCod, _firstAccountName, _firstAccountCod));
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
