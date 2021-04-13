@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:raid_list/screens/lista_reide.dart';
+import 'package:raid_list/screens/create_list_screen.dart';
 
 Future<void> main() async {
   runApp(MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.red,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ListaReide(title: 'Lista de Reide'),
+      home: CreateListScreen(),
     );
   }
 }

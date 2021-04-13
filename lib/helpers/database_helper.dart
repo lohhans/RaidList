@@ -44,7 +44,7 @@ class DatabaseHelper {
   // Cria o Banco de Dados
   void _createDb(Database db, int newVersion) async {
     await db.execute(
-        'CREATE TABLE $gameAccountTable($colAccountName PRIMARY KEY TEXT, $colAccountId TEXT)');
+        'CREATE TABLE $gameAccountTable($colAccountName TEXT PRIMARY KEY, $colAccountId TEXT)');
   }
 
   //Incluir um objeto gameAccount no banco de dados
@@ -90,6 +90,8 @@ class DatabaseHelper {
     Database db = await this.database;
 
     var resultado = await db.query(gameAccountTable);
+
+    print(resultado);
 
     List<GameAccount> lista = resultado.isNotEmpty ? resultado.map((ga) => GameAccount.fromMap(ga)).toList() : [];
 

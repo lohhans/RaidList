@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:mdi/mdi.dart';
+import 'package:raid_list/screens/accounts_screen.dart';
 import 'package:raid_list/services/share_service.dart';
 import 'package:share/share.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -14,30 +16,16 @@ class Boss {
   String sprite;
 
   Boss(this.name, this.sprite);
-
-
-
-  // static List<Boss> getCompanies() {
-  //   return <Boss>[
-  //     Boss(1, 'Apple'),
-  //     Company(2, 'Google'),
-  //     Company(3, 'Samsung'),
-  //     Company(4, 'Sony'),
-  //     Company(5, 'LG'),
-  //   ];
-  // }
 }
 
-class ListaReide extends StatefulWidget {
-  ListaReide({Key key, this.title}) : super(key: key);
-
-  final String title;
+class CreateListScreen extends StatefulWidget {
+  CreateListScreen({Key key}) : super(key: key);
 
   @override
-  _ListaReideState createState() => _ListaReideState();
+  _CreateListScreenState createState() => _CreateListScreenState();
 }
 
-class _ListaReideState extends State<ListaReide> {
+class _CreateListScreenState extends State<CreateListScreen> {
   bool _chocou = false;
   bool _secondAccount = false;
   double _remainTimeOfRaid = 1;
@@ -84,6 +72,12 @@ class _ListaReideState extends State<ListaReide> {
         _now = DateTime.now();
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _everySecond.cancel();
+    super.dispose();
   }
 
   String formatTime(DateTime dateTime) {
@@ -135,7 +129,52 @@ class _ListaReideState extends State<ListaReide> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('Criar lista'),
+      ),
+      drawer: Drawer(
+        // Add a ListView to the drawer. This ensures the user can scroll
+        // through the options in the drawer if there isn't enough vertical
+        // space to fit everything.
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Lista de Reide'),
+              decoration: BoxDecoration(
+                color: Colors.red,
+              ),
+            ),
+            ListTile(
+              title: Text('Criar lista'),
+              onTap: () {
+                Navigator.pop(context);
+                // Navigator.push(context, MaterialPageRoute(builder: (context) => CreateListScreen()));
+              },
+            ),
+            ListTile(
+              title: Text('Contas salvas'),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => AccountsScreen()));
+              },
+            ),
+            ListTile(
+              title: Text('Configurações'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              leading: Icon(Mdi.informationOutline),
+              title: Text('Sobre'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+          ],
+        ),
       ),
       body: Visibility(
         visible: _loading,
