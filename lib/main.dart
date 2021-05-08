@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:raid_list/screens/create_list_screen.dart';
+import 'package:raid_list/configuration.dart';
+import 'package:raid_list/route_generator.dart';
 
 Future<void> main() async {
   runApp(MyApp());
@@ -12,10 +13,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Raid list',
       theme: ThemeData(
-        primarySwatch: Colors.red,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        primaryColor: primaryRed,
+        accentColor: primaryRed,
+        // visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: CreateListScreen(),
+      initialRoute: '/',
+      onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }

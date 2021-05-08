@@ -28,11 +28,13 @@ class _AccountsScreenState extends State<AccountsScreen> {
     // });
 
     fetchAccounts();
-
   }
 
-  fetchAccounts() async{
+  fetchAccounts() async {
     gameAccounts = await db.getGameAccounts();
+    setState(() {
+      //  informa que a consulta foi realizada
+    });
   }
 
   _listGameAccounts(context, index) {
@@ -103,9 +105,11 @@ class _AccountsScreenState extends State<AccountsScreen> {
           ],
         ),
       ),
-      body: ListView.builder(itemCount: gameAccounts.length, itemBuilder: (context, index){
-        return _listGameAccounts(context, index);
-      }),
+      body: ListView.builder(
+          itemCount: gameAccounts.length,
+          itemBuilder: (context, index) {
+            return _listGameAccounts(context, index);
+          }),
     );
   }
 }

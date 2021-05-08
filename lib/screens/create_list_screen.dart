@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:mdi/mdi.dart';
+import 'package:raid_list/configuration.dart';
 import 'package:raid_list/screens/accounts_screen.dart';
 import 'package:raid_list/services/share_service.dart';
 import 'package:share/share.dart';
@@ -32,6 +33,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
   double _timeToStartRaid = 1;
   double _maxWaitingTimeForRaid = 1;
   double _increaseMinutesToMaxWaitingTimeForRaid = 1;
+
   // var _currentTime = DateTime.now();
 
   String _hatchTime = '';
@@ -48,14 +50,12 @@ class _CreateListScreenState extends State<CreateListScreen> {
 
   bool _loading = false;
 
-
   var _now;
   Timer _everySecond; // ignore: unused_field
 
   var bosses;
   List<DropdownMenuItem<Boss>> _dropdownMenuItems;
   Boss _selectedBoss;
-
 
   @override
   void initState() {
@@ -91,9 +91,11 @@ class _CreateListScreenState extends State<CreateListScreen> {
     print('Fetching data from MestrePokemon');
     bosses = await web_fetch_service.fetchDataFromMestrePokemon();
 
-    _dropdownMenuItems = buildDropdownMenuItems(bosses);
-    _selectedBoss = _dropdownMenuItems[0].value;
-    _loading = false;
+    setState(() {
+      _dropdownMenuItems = buildDropdownMenuItems(bosses);
+      _selectedBoss = _dropdownMenuItems[0].value;
+      _loading = false;
+    });
   }
 
   List<DropdownMenuItem<Boss>> buildDropdownMenuItems(List bosses) {
@@ -107,7 +109,13 @@ class _CreateListScreenState extends State<CreateListScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Flexible(flex: 3, child: Center(child: Image.network(boss.sprite, height: 50,))),
+              Flexible(
+                  flex: 3,
+                  child: Center(
+                      child: Image.network(
+                    boss.sprite,
+                    height: 50,
+                  ))),
               Padding(padding: EdgeInsets.symmetric(horizontal: 8)),
               Flexible(flex: 7, child: Text(boss.name)),
             ],
@@ -140,9 +148,12 @@ class _CreateListScreenState extends State<CreateListScreen> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text('Lista de Reide'),
+              child: Text(
+                'Lista de Reide',
+                style: TextStyle(color: Colors.white),
+              ),
               decoration: BoxDecoration(
-                color: Colors.red,
+                color: primaryRed,
               ),
             ),
             ListTile(
@@ -155,12 +166,15 @@ class _CreateListScreenState extends State<CreateListScreen> {
             ListTile(
               title: Text('Contas salvas'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => AccountsScreen()));
+                Navigator.popAndPushNamed(context, '/accounts');
+                // Navigator.push(context, MaterialPageRoute(builder: (context) => AccountsScreen()));
               },
             ),
             ListTile(
               title: Text('Configurações'),
               onTap: () {
+                Navigator.popAndPushNamed(context, '/a');
+
                 // Update the state of the app.
                 // ...
               },
@@ -242,14 +256,13 @@ class _CreateListScreenState extends State<CreateListScreen> {
                               items: _dropdownMenuItems,
                               onChanged: onChangeDropdownItem,
                               // isExpanded: true,
-
                             ),
                             const SizedBox(
                               height: 24,
                             ),
                             TextFormField(
                               cursorColor: Colors.black,
-                              onChanged: (name){
+                              onChanged: (name) {
                                 setState(() {
                                   _gymName = name;
                                 });
@@ -257,11 +270,11 @@ class _CreateListScreenState extends State<CreateListScreen> {
                               decoration: new InputDecoration(
                                 focusedBorder: OutlineInputBorder(
                                   borderSide:
-                                  BorderSide(width: 1.0, color: Colors.red),
+                                      BorderSide(width: 1.0, color: Colors.red),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                  BorderSide(width: 1.0, color: Colors.grey[300]),
+                                  borderSide: BorderSide(
+                                      width: 1.0, color: Colors.grey[300]),
                                 ),
                                 errorBorder: InputBorder.none,
                                 disabledBorder: InputBorder.none,
@@ -333,10 +346,23 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                   Text('Qual o tempo restante da Reide?'),
                                   Slider(
                                     value: _remainTimeOfRaid,
-                                    label: _remainTimeOfRaid.toInt() == 1 ? _remainTimeOfRaid.toInt().toString() + " minuto" : _remainTimeOfRaid.toInt().toString() + " minutos",
-                                    divisions: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
+                                    label: _remainTimeOfRaid.toInt() == 1
+                                        ? _remainTimeOfRaid.toInt().toString() +
+                                            " minuto"
+                                        : _remainTimeOfRaid.toInt().toString() +
+                                            " minutos",
+                                    divisions:
+                                        (DateFormat('EEEE').format(_now) ==
+                                                    'Wednesday' &&
+                                                _now.hour == 18)
+                                            ? 60
+                                            : 45,
                                     min: 1,
-                                    max: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
+                                    max: (DateFormat('EEEE').format(_now) ==
+                                                'Wednesday' &&
+                                            _now.hour == 18)
+                                        ? 60
+                                        : 45,
                                     onChanged: (time) {
                                       setState(() {
                                         _remainTimeOfRaid = time;
@@ -345,14 +371,20 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                       });
                                     },
                                   ),
-                                  Text(_remainTimeOfRaid.toInt() == 1 ? _remainTimeOfRaid.toInt().toString() + " minuto" : _remainTimeOfRaid.toInt().toString() + " minutos"),
+                                  Text(_remainTimeOfRaid.toInt() == 1
+                                      ? _remainTimeOfRaid.toInt().toString() +
+                                          " minuto"
+                                      : _remainTimeOfRaid.toInt().toString() +
+                                          " minutos"),
                                   const SizedBox(
                                     height: 24,
                                   ),
                                   Text('Que horas você quer fazer a Reide?'),
                                   Slider(
                                     value: _maxWaitingTimeForRaid,
-                                    label: formatTime(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt()))),
+                                    label: formatTime(_now.add(Duration(
+                                        minutes:
+                                            _maxWaitingTimeForRaid.toInt()))),
                                     divisions: _remainTimeOfRaid.toInt(),
                                     min: 1,
                                     max: _remainTimeOfRaid,
@@ -362,7 +394,9 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                       });
                                     },
                                   ),
-                                  Text(formatTime(_now.add(Duration(minutes: _maxWaitingTimeForRaid.toInt())))),
+                                  Text(formatTime(_now.add(Duration(
+                                      minutes:
+                                          _maxWaitingTimeForRaid.toInt())))),
                                   const SizedBox(
                                     height: 24,
                                   ),
@@ -370,10 +404,15 @@ class _CreateListScreenState extends State<CreateListScreen> {
                               ),
                               replacement: Column(
                                 children: [
-                                  Text('Quantos minutos faltam para a Reide iniciar?'),
+                                  Text(
+                                      'Quantos minutos faltam para a Reide iniciar?'),
                                   Slider(
                                     value: _timeToStartRaid,
-                                    label: _timeToStartRaid.toInt() == 1 ? _timeToStartRaid.toInt().toString() + " minuto" : _timeToStartRaid.toInt().toString() + " minutos",
+                                    label: _timeToStartRaid.toInt() == 1
+                                        ? _timeToStartRaid.toInt().toString() +
+                                            " minuto"
+                                        : _timeToStartRaid.toInt().toString() +
+                                            " minutos",
                                     divisions: 60,
                                     min: 1,
                                     max: 60,
@@ -382,33 +421,65 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                         // _maxWaitingTimeForRaid = 1;
                                         _timeToStartRaid = time;
 
-                                        _hatchTime = formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt())));
-                                        print('_hatchTime: '+_hatchTime);
+                                        _hatchTime = formatTime(_now.add(
+                                            Duration(
+                                                minutes:
+                                                    _timeToStartRaid.toInt())));
+                                        print('_hatchTime: ' + _hatchTime);
                                         // _raidStartAt.add(Duration(minutes: _timeToStartRaid.toInt()));
                                       });
                                     },
                                   ),
-                                  Text(_timeToStartRaid.toInt() == 1 ? _timeToStartRaid.toInt().toString() + " minuto" : _timeToStartRaid.toInt().toString() + " minutos"),
+                                  Text(_timeToStartRaid.toInt() == 1
+                                      ? _timeToStartRaid.toInt().toString() +
+                                          " minuto"
+                                      : _timeToStartRaid.toInt().toString() +
+                                          " minutos"),
                                   const SizedBox(
                                     height: 24,
                                   ),
-                                  Text('Que horas você quer fazer a Reide? (Choca: ' + formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt()))) + ')'),
+                                  Text(
+                                      'Que horas você quer fazer a Reide? (Choca: ' +
+                                          formatTime(_now.add(Duration(
+                                              minutes:
+                                                  _timeToStartRaid.toInt()))) +
+                                          ')'),
                                   Slider(
-                                    value: _increaseMinutesToMaxWaitingTimeForRaid,
-                                    label: formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt()))),
-                                    divisions: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
+                                    value:
+                                        _increaseMinutesToMaxWaitingTimeForRaid,
+                                    label: formatTime(_now.add(Duration(
+                                        minutes: _timeToStartRaid.toInt() +
+                                            _increaseMinutesToMaxWaitingTimeForRaid
+                                                .toInt()))),
+                                    divisions:
+                                        (DateFormat('EEEE').format(_now) ==
+                                                    'Wednesday' &&
+                                                _now.hour == 18)
+                                            ? 60
+                                            : 45,
                                     min: 1,
-                                    max: (DateFormat('EEEE').format(_now) == 'Wednesday' && _now.hour == 18) ? 60 : 45,
+                                    max: (DateFormat('EEEE').format(_now) ==
+                                                'Wednesday' &&
+                                            _now.hour == 18)
+                                        ? 60
+                                        : 45,
                                     onChanged: (time) {
                                       setState(() {
-                                        _increaseMinutesToMaxWaitingTimeForRaid = time;
+                                        _increaseMinutesToMaxWaitingTimeForRaid =
+                                            time;
 
-                                        _partyTime = formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt())));
-                                        print('_partyTime: '+_partyTime);
+                                        _partyTime = formatTime(_now.add(Duration(
+                                            minutes: _timeToStartRaid.toInt() +
+                                                _increaseMinutesToMaxWaitingTimeForRaid
+                                                    .toInt())));
+                                        print('_partyTime: ' + _partyTime);
                                       });
                                     },
                                   ),
-                                  Text(formatTime(_now.add(Duration(minutes: _timeToStartRaid.toInt() + _increaseMinutesToMaxWaitingTimeForRaid.toInt())))),
+                                  Text(formatTime(_now.add(Duration(
+                                      minutes: _timeToStartRaid.toInt() +
+                                          _increaseMinutesToMaxWaitingTimeForRaid
+                                              .toInt())))),
                                   const SizedBox(
                                     height: 24,
                                   ),
@@ -447,7 +518,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
                             ),
                             TextFormField(
                               cursorColor: Colors.black,
-                              onChanged: (name){
+                              onChanged: (name) {
                                 setState(() {
                                   _firstAccountName = name;
                                 });
@@ -456,11 +527,11 @@ class _CreateListScreenState extends State<CreateListScreen> {
                               decoration: new InputDecoration(
                                 focusedBorder: OutlineInputBorder(
                                   borderSide:
-                                  BorderSide(width: 1.0, color: Colors.red),
+                                      BorderSide(width: 1.0, color: Colors.red),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                  BorderSide(width: 1.0, color: Colors.grey[300]),
+                                  borderSide: BorderSide(
+                                      width: 1.0, color: Colors.grey[300]),
                                 ),
                                 errorBorder: InputBorder.none,
                                 disabledBorder: InputBorder.none,
@@ -479,7 +550,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
                             ),
                             TextFormField(
                               cursorColor: Colors.black,
-                              onChanged: (name){
+                              onChanged: (name) {
                                 setState(() {
                                   _firstAccountCod = name;
                                 });
@@ -488,11 +559,11 @@ class _CreateListScreenState extends State<CreateListScreen> {
                               decoration: new InputDecoration(
                                 focusedBorder: OutlineInputBorder(
                                   borderSide:
-                                  BorderSide(width: 1.0, color: Colors.red),
+                                      BorderSide(width: 1.0, color: Colors.red),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                  BorderSide(width: 1.0, color: Colors.grey[300]),
+                                  borderSide: BorderSide(
+                                      width: 1.0, color: Colors.grey[300]),
                                 ),
                                 errorBorder: InputBorder.none,
                                 disabledBorder: InputBorder.none,
@@ -536,7 +607,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                   ),
                                   TextFormField(
                                     cursorColor: Colors.black,
-                                    onChanged: (name){
+                                    onChanged: (name) {
                                       setState(() {
                                         _firstAccountName = name;
                                       });
@@ -544,12 +615,13 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                     // keyboardType: inputType,
                                     decoration: new InputDecoration(
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide:
-                                        BorderSide(width: 1.0, color: Colors.red),
+                                        borderSide: BorderSide(
+                                            width: 1.0, color: Colors.red),
                                       ),
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide:
-                                        BorderSide(width: 1.0, color: Colors.grey[300]),
+                                        borderSide: BorderSide(
+                                            width: 1.0,
+                                            color: Colors.grey[300]),
                                       ),
                                       errorBorder: InputBorder.none,
                                       disabledBorder: InputBorder.none,
@@ -559,7 +631,8 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                         top: 0,
                                         right: 8,
                                       ),
-                                      labelText: 'Informe o nick da primeira conta',
+                                      labelText:
+                                          'Informe o nick da primeira conta',
                                       // hintText: "Insira seu nick",
                                     ),
                                   ),
@@ -568,7 +641,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                   ),
                                   TextFormField(
                                     cursorColor: Colors.black,
-                                    onChanged: (name){
+                                    onChanged: (name) {
                                       setState(() {
                                         _firstAccountCod = name;
                                       });
@@ -576,12 +649,13 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                     // keyboardType: inputType,
                                     decoration: new InputDecoration(
                                       focusedBorder: OutlineInputBorder(
-                                        borderSide:
-                                        BorderSide(width: 1.0, color: Colors.red),
+                                        borderSide: BorderSide(
+                                            width: 1.0, color: Colors.red),
                                       ),
                                       enabledBorder: OutlineInputBorder(
-                                        borderSide:
-                                        BorderSide(width: 1.0, color: Colors.grey[300]),
+                                        borderSide: BorderSide(
+                                            width: 1.0,
+                                            color: Colors.grey[300]),
                                       ),
                                       errorBorder: InputBorder.none,
                                       disabledBorder: InputBorder.none,
@@ -591,7 +665,8 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                         top: 0,
                                         right: 8,
                                       ),
-                                      labelText: 'Informe o código da primeira conta',
+                                      labelText:
+                                          'Informe o código da primeira conta',
                                       // hintText: "Insira seu nick",
                                     ),
                                   ),
@@ -620,19 +695,27 @@ class _CreateListScreenState extends State<CreateListScreen> {
                               // onPressed: ()  => Share.share('🔱 Boss: $_raidBoss \n ⛩ Gym: $_raidGym \n Eclode: $_timeToStartRaid \n" ⚔ Bater: $_raidBoss \n', subject: 'Look what I made!'),
                               // onPressed: ()  => ,
 
-
                               onPressed: () async {
                                 ShareService shareService = ShareService();
 
                                 var today = new DateTime.now();
-                                var endOfRaid = today.add(Duration(minutes: _remainTimeOfRaid.toInt()));
-
+                                var endOfRaid = today.add(Duration(
+                                    minutes: _remainTimeOfRaid.toInt()));
 
                                 // Output: 01/01/2021, 02:41 PM
                                 // print(formatTime(endOfRaid));
                                 // print(_timeToStartRaid);
                                 // Share.share(_stringDataOfRaid + '\n' + _accountsData + '\n' + _warningsInfo);
-                                Share.share(shareService.fullShare(_raidBoss, _raidGym, _hatchTime, _endTime, _partyTime, _firstAccountName, _firstAccountCod, _firstAccountName, _firstAccountCod));
+                                Share.share(shareService.fullShare(
+                                    _raidBoss,
+                                    _raidGym,
+                                    _hatchTime,
+                                    _endTime,
+                                    _partyTime,
+                                    _firstAccountName,
+                                    _firstAccountCod,
+                                    _firstAccountName,
+                                    _firstAccountCod));
                               },
                             ),
                           ],
