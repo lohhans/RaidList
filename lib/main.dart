@@ -1,25 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:raid_list/configuration.dart';
+import 'package:provider/provider.dart';
+import 'package:raid_list/initialize_get_it.dart';
 import 'package:raid_list/route_generator.dart';
+import 'package:raid_list/screens/home_screen.dart';
+import 'package:raid_list/services/web_fetch_service.dart';
+import 'package:raid_list/viewmodels/bosses_view_model.dart';
 
-Future<void> main() async {
-  runApp(MyApp());
+import 'configuration.dart';
+
+void main() async {
+  getIt.registerLazySingleton(() => WebFetchService());
+  BossesViewModel bossesViewModel = BossesViewModel();
+
+  bossesViewModel.onAppStart().then((_) {
+    runApp(MyApp(bossesViewModel));
+  });
 }
 
 class MyApp extends StatelessWidget {
+
+  final BossesViewModel bossesViewModel;
+
+  MyApp(this.bossesViewModel);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Raid list',
       theme: ThemeData(
-        primaryColor: primaryRed,
-        accentColor: primaryRed,
-        // visualDensity: VisualDensity.adaptivePlatformDensity,
+        primarySwatch: customRed,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: '/',
+      home: Provider(
+        create: (context) => bossesViewModel,
+        child: HomeScreen(),
+      ),
+      // initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }
-

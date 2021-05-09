@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:raid_list/main.dart';
 import 'package:raid_list/screens/accounts_screen.dart';
-import 'package:raid_list/screens/create_list_screen.dart';
+import 'package:raid_list/screens/home_screen.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
+    // ignore: unused_local_variable
     final args = settings.arguments;
 
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => CreateListScreen());
+        return MaterialPageRoute(builder: (_) => HomeScreen());
       case '/accounts':
         return MaterialPageRoute(builder: (_) => AccountsScreen());
       default:

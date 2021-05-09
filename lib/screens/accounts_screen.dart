@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mdi/mdi.dart';
 import 'package:raid_list/helpers/database_helper.dart';
 import 'package:raid_list/models/game_account_model.dart';
-import 'package:raid_list/screens/create_list_screen.dart';
 
 class AccountsScreen extends StatefulWidget {
   @override
@@ -75,10 +74,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
             ListTile(
               title: Text('Criar lista'),
               onTap: () {
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => CreateListScreen()),
-                    (Route<dynamic> route) => false);
+                Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
               },
             ),
             ListTile(
