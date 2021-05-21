@@ -2,13 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:raid_list/models/boss_model.dart';
 import 'package:raid_list/services/share_service.dart';
+import 'package:raid_list/viewmodels/bosses_view_model.dart';
 import 'package:share/share.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
-import '../configuration.dart';
+import '../../configuration.dart';
 
 class CreateListScreen extends StatefulWidget {
   final List<Map<String, dynamic>> bosses;
@@ -39,7 +42,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
   String _gymName = '';
   String _firstAccountName = '';
   String _firstAccountCod = '';
-  String _secondtAccountName = '';
+  String _secondAccountName = '';
   String _secondAccountCod = '';
 
   bool _loading = false;
@@ -73,7 +76,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
     super.dispose();
   }
 
-  Future<void> getBosses() async {
+  getBosses() async {
     // _loading = true;
 
     // bosses = await WebFetchService().fetchDataFromMestrePokemon();
@@ -81,7 +84,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
 
     setState(() {
       _dropdownMenuItems = buildDropdownMenuItems(widget.bosses);
-      _selectedBoss = _dropdownMenuItems[0].value;
+      _selectedBoss = null;
       // _loading = false;
     });
   }
@@ -99,20 +102,35 @@ class _CreateListScreenState extends State<CreateListScreen> {
       items.add(
         DropdownMenuItem(
           value: boss,
-          onTap: () => print(boss.name),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                  flex: 3,
-                  child: Center(
-                      child: Image.network(
-                        boss.sprite,
-                        height: 50,
-                      ))),
-              Padding(padding: EdgeInsets.symmetric(horizontal: 8)),
-              Flexible(flex: 7, child: Text(boss.name)),
-            ],
+          onTap: () {
+            print('Aqui mizera');
+            print(boss.name);
+            _selectedBoss = boss;
+          },
+          child: Container(
+            width: 200.0, //200.0 to 100.0
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                /*Flexible(
+                    flex: 3,
+                    child: Center(
+                        child: boss.sprite.contains('http') ? Image.network(
+                          boss.sprite,
+                          height: 50,
+                        ) : Image.asset(boss.sprite, height: 50, fit: BoxFit.fitHeight,))),
+                Padding(padding: EdgeInsets.symmetric(horizontal: 8)),
+                Flexible(flex: 7, child: Text(boss.name)),*/
+
+                boss.sprite.contains('http') ? Image.network(
+                  boss.sprite,
+                  width: Get.width * 0.1,
+                ) : Image.asset(boss.sprite, width: Get.width * 0.1,),
+                SizedBox(width: 16),
+                Text(boss.name, overflow: TextOverflow.ellipsis,),
+              ],
+            ),
           ),
         ),
       );
@@ -122,13 +140,18 @@ class _CreateListScreenState extends State<CreateListScreen> {
 
   onChangeDropdownItem(Boss selectedBoss) {
     setState(() {
+      print('chegou 1');
       _selectedBoss = selectedBoss;
+      print('chegou 2');
       _raidBoss = _selectedBoss.name;
+      print('chegou 3');
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final BossesViewModel _bossesViewModel = Provider.of<BossesViewModel>(context);
+
     return Visibility(
       visible: _loading,
       child: Container(
@@ -161,41 +184,33 @@ class _CreateListScreenState extends State<CreateListScreen> {
                           const SizedBox(
                             height: 24,
                           ),
-                          /*TextFormField(
-                              cursorColor: Colors.black,
-                              onChanged: (name){
-                                setState(() {
-                                  _raidBoss = name;
-                                });
-                              },
-                              // keyboardType: inputType,
-                              decoration: new InputDecoration(
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                  BorderSide(width: 1.0, color: primaryRed),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                  BorderSide(width: 1.0, color: Colors.grey[300]),
-                                ),
-                                errorBorder: InputBorder.none,
-                                disabledBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.only(
-                                  left: 8,
-                                  bottom: 4,
-                                  top: 0,
-                                  right: 8,
-                                ),
-                                labelText: 'Informe o chefe da Reide',
-                                // hintText: "Insira seu nick",
-                              ),
-                            ),*/
-                          DropdownButton(
+                          /*DropdownButton(
+                            value: _selectedBoss,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedBoss = value;
+                              });
+                            },
+                            items: _bossesViewModel.bosses.map((value) {
+                              // Boss boss = new Boss(value['name'], value['sprite']);
+                              return DropdownMenuItem(child: Text(value['name']));
+                            }),
+                            // isExpanded: true,
+                          ),*/
+                          DropdownButton<Boss>(
                             value: _selectedBoss,
                             items: _dropdownMenuItems,
                             onChanged: onChangeDropdownItem,
+                            underline: SizedBox(),
+                            hint: _selectedBoss != null
+                                ? null
+                                : Text(
+                              'Selecione o chefe de reide',
+                              style: TextStyle(color: Colors.black),
+                            ),
                             // isExpanded: true,
                           ),
+                          // TextButton(onPressed: () => print(_bossesViewModel.bosses), child: Text('oi')),
                           const SizedBox(
                             height: 24,
                           ),

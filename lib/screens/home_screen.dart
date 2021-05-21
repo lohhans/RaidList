@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mdi/mdi.dart';
 import 'package:provider/provider.dart';
-import 'package:raid_list/screens/create_list_screen.dart';
+import 'package:raid_list/screens/create_list/create_list_screen.dart';
+import 'package:raid_list/screens/modules/drawer.dart';
 import 'package:raid_list/viewmodels/bosses_view_model.dart';
 
-import '../configuration.dart';
-
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -16,59 +22,55 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Criar lista'),
-      ),
-      drawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text(
-                'Lista de Reide',
-                style: TextStyle(color: Colors.white),
-              ),
-              decoration: BoxDecoration(
-                color: primaryRed,
-              ),
-            ),
-            ListTile(
-              title: Text('Criar lista'),
-              onTap: () {
-                Navigator.pop(context);
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => CreateListScreen()));
-              },
-            ),
-            ListTile(
-              title: Text('Contas salvas'),
-              onTap: () {
-                Navigator.popAndPushNamed(context, '/accounts');
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => AccountsScreen()));
-              },
-            ),
-            ListTile(
-              title: Text('Configurações'),
-              onTap: () {
-                Navigator.popAndPushNamed(context, '/a');
+        actions: [
+          _bossesViewModel.bosses.length == 1 ? Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () async {
+                  setState(() {
+                    loading = true;
 
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              leading: Icon(Mdi.informationOutline),
-              title: Text('Sobre'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-          ],
-        ),
+                  });
+                  await _bossesViewModel.onAppStart();
+                  setState(() {
+
+                    loading = false;
+                  });
+                },
+                child: Icon(
+                  Mdi.reload,
+                  size: 26.0,
+                ),
+              )
+          ) : Container(),
+
+          /*Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () async {
+                  setState(() {
+                    loading = true;
+                  });
+                  await _bossesViewModel.onAppStart();
+                  print('att');
+                  *//*setState(() {
+                    loading = false;
+                  });*//*
+                },
+                child: Icon(
+                  Mdi.reload,
+                  size: 26.0,
+                ),
+              )
+          )*/
+        ],
       ),
-      body: CreateListScreen(bosses: _bossesViewModel.bosses,),
+      drawer: MyDrawer(),
+      body: Visibility(
+        visible: loading,
+        child: Center(child: CircularProgressIndicator()),
+        replacement: CreateListScreen(bosses: _bossesViewModel.bosses,),
+      ),
     );
   }
 }

@@ -29,6 +29,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons:
   font_awesome_flutter:
+  get:
   get_it:
   html:
   http:
@@ -40,6 +41,7 @@ dependencies:
   share:
   sqflite:
   toggle_switch:
+  shared_preferences:
 
 
 dev_dependencies:
@@ -58,7 +60,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - images/
+    - images/connection_error.png
   fonts:
     - family: Circular
       fonts:

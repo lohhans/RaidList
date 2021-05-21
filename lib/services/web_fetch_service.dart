@@ -6,7 +6,9 @@ class WebFetchService {
 
 
 
-  Future fetchDataFromLeekDuck() async {
+  Future<List<Map<String, dynamic>>> fetchDataFromLeekDuck() async {
+    print('Fetching data from LeekDuck');
+
     try {
       var client = Client();
       Response response = await client.get(Uri.parse('https://leekduck.com/boss/'));
@@ -36,13 +38,21 @@ class WebFetchService {
 
       return bosses;
     } on Exception catch (e) {
-      print('Erro no service');
-      return null;
+      print('Erro no service "fetchDataFromLeekDuck" -> '+ e.toString());
+
+      // Bosses in json
+      List<Map<String, dynamic>> bossesWhenNull = [];
+      bossesWhenNull.add({
+        'name': 'Erro de conexão',
+        'sprite': 'images/connection_error.png',
+      });
+
+      return bossesWhenNull;
     }
   }
 
   Future<List<Map<String, dynamic>>> fetchDataFromMestrePokemon() async {
-    print('Fethcing data from MestrePokemon');
+    print('Fetching data from MestrePokemon');
 
     try {
       var client = Client();
@@ -70,8 +80,16 @@ class WebFetchService {
 
       return bosses;
     } on Exception catch (e) {
-      print('Erro no service');
-      return null;
+      print('Erro no service "fetchDataFromMestrePokemon" -> '+ e.toString());
+
+      // Bosses in json
+      List<Map<String, dynamic>> bossesWhenNull = [];
+      bossesWhenNull.add({
+        'name': 'Erro de conexão',
+        'sprite': 'images/connection_error.png',
+      });
+
+      return bossesWhenNull;
     }
   }
 }
