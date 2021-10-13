@@ -10,6 +10,7 @@ import 'package:raid_list/services/share_service.dart';
 import 'package:raid_list/viewmodels/bosses_view_model.dart';
 import 'package:share/share.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 import '../../configuration.dart';
 
@@ -48,7 +49,9 @@ class _CreateListScreenState extends State<CreateListScreen> {
   bool _loading = false;
 
   var _now;
-  Timer _everySecond; // ignore: unused_field
+  Timer _everySecond;
+
+  final TextEditingController _typeAheadController = TextEditingController();
 
   List<DropdownMenuItem<Boss>> _dropdownMenuItems;
   Boss _selectedBoss;
@@ -104,7 +107,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
           value: boss,
           onTap: () {
             print('Aqui mizera');
-            print(boss.name);
+            // print(boss.name);
             _selectedBoss = boss;
           },
           child: Container(
@@ -221,6 +224,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
                                 _gymName = name;
                               });
                             },
+                            enableSuggestions: true,
                             decoration: new InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderSide:
@@ -248,7 +252,47 @@ class _CreateListScreenState extends State<CreateListScreen> {
                   ],
                 ),
               ),
+
+              // TypeAheadField(
+              //   hideSuggestionsOnKeyboardHide: true,
+              //   textFieldConfiguration: TextFieldConfiguration(
+              //       controller: this._typeAheadController,
+              //       // autofocus: true,
+              //       style: DefaultTextStyle.of(context).style.copyWith(
+              //           // fontStyle: FontStyle.italic
+              //       ),
+              //       decoration: InputDecoration(
+              //           border: OutlineInputBorder()
+              //       )
+              //   ),
+              //   suggestionsCallback:  (pattern) async {
+              //     return [
+              //       {"name": "oi", "price": "0"},
+              //       {"name": "oi2", "price": "1"}
+              //     ];
+              //     // return await BackendService.getSuggestions(pattern);
+              //   },
+              //
+              //   itemBuilder: (context, suggestion) {
+              //     return ListTile(
+              //       leading: Icon(Icons.shopping_cart),
+              //       title: Text(suggestion['name']),
+              //       subtitle: Text('\$${suggestion['price']}'),
+              //     );
+              //   },
+              //   hideOnEmpty: true,
+              //   onSuggestionSelected: (suggestion) {
+              //     /*Navigator.of(context).push(MaterialPageRoute(
+              //         builder: (context) => ProductPage(product: suggestion)
+              //     ));*/
+              //     setState(() {
+              //       _typeAheadController.text = suggestion['name'];
+              //     });
+              //   },
+              // ),
               // TIME
+
+              // RAID TIME
               Card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -446,6 +490,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
                   ],
                 ),
               ),
+
               // ACCOUNTS
               Card(
                 child: Column(
@@ -633,6 +678,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
                   ],
                 ),
               ),
+
               // SHARE
               Card(
                 child: Column(
@@ -643,9 +689,8 @@ class _CreateListScreenState extends State<CreateListScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          FlatButton(
+                          TextButton(
                             child: Text('Compartilhar'),
-                            color: primaryRed,
                             // onPressed: ()  => Share.share('🔱 Boss: $_raidBoss \n ⛩ Gym: $_raidGym \n Eclode: $_timeToStartRaid \n" ⚔ Bater: $_raidBoss \n', subject: 'Look what I made!'),
                             // onPressed: ()  => ,
 
@@ -660,16 +705,23 @@ class _CreateListScreenState extends State<CreateListScreen> {
                               // print(formatTime(endOfRaid));
                               // print(_timeToStartRaid);
                               // Share.share(_stringDataOfRaid + '\n' + _accountsData + '\n' + _warningsInfo);
-                              Share.share(shareService.fullShare(
-                                  _raidBoss,
-                                  _raidGym,
-                                  _hatchTime,
-                                  _endTime,
-                                  _partyTime,
-                                  _firstAccountName,
-                                  _firstAccountCod,
-                                  _firstAccountName,
-                                  _firstAccountCod));
+                              Share.share(
+                                shareService.inviteShare(
+                                  raidBoss: _raidBoss,
+                                  raidGym: _raidGym,
+                                  hatchTime: _hatchTime,
+                                  endTime: _endTime,
+                                  partyTime: _partyTime,
+                                  firstAccountName: _firstAccountName,
+                                  firstAccountCod: _firstAccountCod,
+                                  secondAccountName: _firstAccountName,
+                                  secondAccountCod: _firstAccountCod,
+                                  warnings: true,
+                                ),
+                              );
+
+                              _selectedBoss = null;
+                              _chocou = false;
                             },
                           ),
                         ],
